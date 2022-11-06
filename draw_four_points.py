@@ -591,7 +591,6 @@ if 1:
                 break
             r_prev = copy(r)
             
-            print(round(calc_coverage(A_slime, max_area, sum_A)*100,2))
 
             # This prints out A matrix and A_slime matrix if True
             if False:
@@ -605,6 +604,7 @@ if 1:
             # Coverage calculation
             coverage = calc_coverage(A_slime, max_area, sum_A)
             coverage_list.append(coverage)
+            print(round(calc_coverage(A_slime, max_area, sum_A)*100,2))
             
         # walked out of the image
         except IndexError:

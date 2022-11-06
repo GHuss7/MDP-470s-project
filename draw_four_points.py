@@ -557,7 +557,7 @@ if 1:
     # Setup for the stopping coverage criterion
     max_area = A.shape[0]*A.shape[1]
     sum_A = A.sum()
-    stop_coverage = 80 # stop criterion measured in percentage
+    stop_coverage = 20 # stop criterion measured in percentage
 
     def calc_coverage(A_slime, max_area, sum_A):
         """
@@ -568,15 +568,16 @@ if 1:
         :return: float percentage coverage
         """
         original_open_area = sum_A
-        A_slime[A_slime < 1] = 0
-        area_difference = original_open_area - A_slime.sum()
-        return (area_difference/original_open_area)
+        sum_test = A_slime.copy()
+        sum_test[sum_test < 1] = 0
+        area_difference = original_open_area - sum_test.sum()
+        return (area_difference/original_open_area)*100
 
     coverage = calc_coverage(A_slime, max_area, sum_A)
     coverage_list = [coverage] # coverage stopping criterion list
 
     for i in range(999999999999999):
-        if i % 10000 == 0:
+        if i % 50 == 0:
             imshow_gray_as_purple(A_slime, plotdir)
 
         try:
@@ -605,14 +606,14 @@ if 1:
             # Coverage calculation
             coverage = calc_coverage(A_slime, max_area, sum_A)
             coverage_list.append(coverage)
-            print(round(calc_coverage(A_slime, max_area, sum_A)*100,2))
+            print(round(coverage,2))
             
         # walked out of the image
         except IndexError:
             break
 
         # Test for stopping criterion and break out of for loop
-        if coverage >= stop_coverage/100:
+        if coverage >= stop_coverage:
             break
 
     #r_prev.get_best_angle_from_image(A_slime, True)

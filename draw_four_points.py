@@ -17,6 +17,8 @@ from scipy import ndimage
 from locate import this_dir
 from pathlib import Path
 
+import pandas as pd
+
 tau = 2 * np.pi
 
 
@@ -551,7 +553,28 @@ if 1:
 
     r_prev = copy(r)
     angle = 0
-    for i in range(9999999999999):
+
+    # Setup for the stopping coverage criterion
+    max_area = A.shape[0]*A.shape[1]
+    sum_A = A.sum()
+    stop_coverage = 0.25 # stop criterion measured in percentage
+
+    def calc_coverage(A_slime, max_area, sum_A):
+        """
+        Calculate the coverage of the map
+        :param A_slime: normal vector
+        :param max_area: float
+        :param sum_A: float
+        :return: float percentage coverage
+        """
+        original_open_area = max_area - sum_A
+        area_difference = A_slime.sum() - original_open_area
+        return (area_difference/original_open_area)*-1
+
+    coverage = calc_coverage(A_slime, max_area, sum_A)
+    coverage_list = [coverage] # coverage stopping criterion list
+
+    for i in range(999999999999999):
         if i % 50 == 0:
             imshow_gray_as_purple(A_slime, plotdir)
 
@@ -567,12 +590,35 @@ if 1:
             if stop:
                 break
             r_prev = copy(r)
+            
+            print(round(calc_coverage(A_slime, max_area, sum_A)*100,2))
 
+            # This prints out A matrix and A_slime matrix if True
+            if False:
+                if i % 50 == 0:
+                    A_dir = Path(f"A matrix")
+                    A_dir.mkdir(parents=True, exist_ok=True)
+                    A_date_time = get_current_datetime_as_string()
+                    pd.DataFrame(A).to_csv(f"A matrix\\A_{A_date_time}.csv")
+                    pd.DataFrame(A_slime).to_csv(f"A matrix\\A_slime_{A_date_time}.csv")
+
+            # Coverage calculation
+            coverage = calc_coverage(A_slime, max_area, sum_A)
+            coverage_list.append(coverage)
+            
         # walked out of the image
         except IndexError:
+            break
+
+        # Test for stopping criterion and break out of for loop
+        if coverage >= stop_coverage/100:
             break
 
     #r_prev.get_best_angle_from_image(A_slime, True)
     #r.get_best_angle_from_image(A_slime, True)
 
     imshow_gray_as_purple(A_slime*A, plotdir)
+
+    
+    Path(f"Coverage list").mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(coverage_list).to_csv(f"Coverage list\\Coverage_list_{get_current_datetime_as_string()}.csv")

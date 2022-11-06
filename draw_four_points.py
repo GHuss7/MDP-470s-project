@@ -557,7 +557,7 @@ if 1:
     # Setup for the stopping coverage criterion
     max_area = A.shape[0]*A.shape[1]
     sum_A = A.sum()
-    stop_coverage = 0.25 # stop criterion measured in percentage
+    stop_coverage = 80 # stop criterion measured in percentage
 
     def calc_coverage(A_slime, max_area, sum_A):
         """
@@ -567,15 +567,16 @@ if 1:
         :param sum_A: float
         :return: float percentage coverage
         """
-        original_open_area = max_area - sum_A
-        area_difference = A_slime.sum() - original_open_area
-        return (area_difference/original_open_area)*-1
+        original_open_area = sum_A
+        A_slime[A_slime < 1] = 0
+        area_difference = original_open_area - A_slime.sum()
+        return (area_difference/original_open_area)
 
     coverage = calc_coverage(A_slime, max_area, sum_A)
     coverage_list = [coverage] # coverage stopping criterion list
 
     for i in range(999999999999999):
-        if i % 50 == 0:
+        if i % 10000 == 0:
             imshow_gray_as_purple(A_slime, plotdir)
 
         try:

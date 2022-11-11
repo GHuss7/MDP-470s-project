@@ -155,5 +155,9 @@ plots
 binimage.png
 binimage.png
 
+# Folders
 A matrix
 Coverage list
+
+# Zip files
+*.zip
